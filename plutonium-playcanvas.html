@@ -1,0 +1,36 @@
+<link rel="import" href="../polymer/polymer-element.html">
+
+<dom-module id="plutonium-playcanvas">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+    <h2>Hello [[prop1]]!</h2>
+  </template>
+
+  <script>
+    /**
+     * `plutonium-playcanvas`
+     * Plutonium 2.0 based wrapper element for PlayCanvas Engine.
+     *
+     * @customElement
+     * @polymer
+     * @demo demo/index.html
+     */
+    class PlutoniumPlaycanvas extends Polymer.Element {
+      static get is() { return 'plutonium-playcanvas'; }
+      static get properties() {
+        return {
+          prop1: {
+            type: String,
+            value: 'plutonium-playcanvas'
+          }
+        };
+      }
+    }
+
+    window.customElements.define(PlutoniumPlaycanvas.is, PlutoniumPlaycanvas);
+  </script>
+</dom-module>
