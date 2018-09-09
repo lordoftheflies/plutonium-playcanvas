@@ -56,9 +56,9 @@
         }
 
         disconnectedCallback() {
-            super.connectedCallback();
+            super.disconnectedCallback();
 
-            this.dispatchEvent(new CustomEvent('playcanvas-initialize', {}));
+            this.dispatchEvent(new CustomEvent('playcanvas-destroy', {}));
             console.debug(this.id, 'detached');
 
             this.application.destroy();
@@ -70,8 +70,6 @@
 
         onUpdateApplication(event) {
             console.warn(this.id, 'should override update');
-            let deltaTime = event.detail.delta;
-            cube.rotate(10 * deltaTime, 20 * deltaTime, 30 * deltaTime);
         }
     });
 
