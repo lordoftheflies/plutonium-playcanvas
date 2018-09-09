@@ -1,0 +1,81 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../../polymer/polymer-element.html">
+<link rel="import" href="../plutonium-playcanvas-application-mixin.html">
+
+<dom-module id="game-demo">
+    <template>
+        <style>
+            :host {
+                display: none;
+            }
+        </style>
+    </template>
+
+    <script>
+        class GameDemoView extends window.Plutonium.PlaycanvasApplicationMixin(Polymer.Element) {
+            static get is() {
+                return 'game-demo';
+            }
+
+
+            constructor() {
+                super();
+            }
+
+            onInitializeApplication(event) {
+                console.debug(this.id, 'initialize');
+
+                let app = this.get('application');
+                // fill the available space at full resolution
+                app.setCanvasFillMode(pc.FILLMODE_KEEP_ASPECT);
+                app.setCanvasResolution(pc.RESOLUTION_AUTO);
+
+                // create box entity
+                this.cube = new pc.Entity('cube');
+                this.cube.addComponent('model', {
+                    type: 'box'
+                });
+
+                // create camera entity
+                var camera = new pc.Entity('camera');
+                camera.addComponent('camera', {
+                    clearColor: new pc.Color(0.1, 0.1, 0.1)
+                });
+
+                // create directional light entity
+                var light = new pc.Entity('light');
+                light.addComponent('light');
+
+                // add to hierarchy
+                app.root.addChild(this.cube);
+                app.root.addChild(camera);
+                app.root.addChild(light);
+
+                // set up initial positions and orientations
+                camera.setPosition(0, 0, 3);
+                light.setEulerAngles(45, 0, 0);
+
+
+            }
+
+            onUpdateApplication(event) {
+                if (this.cube) {
+                    let deltaTime = event.detail.delta;
+                    this.cube.rotate(10 * deltaTime, 20 * deltaTime, 30 * deltaTime);
+
+                }
+            }
+        }
+
+        window.customElements.define(GameDemoView.is, GameDemoView);
+    </script>
+</dom-module>

@@ -11,6 +11,7 @@
     <link rel="import" href="../../iron-demo-helpers/demo-pages-shared-styles.html">
     <link rel="import" href="../../iron-demo-helpers/demo-snippet.html">
     <link rel="import" href="../plutonium-playcanvas.html">
+    <link rel="import" href="game-demo.html">
 
     <custom-style>
       <style is="custom-style" include="demo-pages-shared-styles">
@@ -22,7 +23,9 @@
       <h3>Basic plutonium-playcanvas demo</h3>
       <demo-snippet>
         <template>
-          <plutonium-playcanvas></plutonium-playcanvas>
+          <plutonium-playcanvas>
+            <game-demo id="my-demo-game" slot="game"></game-demo>
+          </plutonium-playcanvas>
         </template>
       </demo-snippet>
     </div>

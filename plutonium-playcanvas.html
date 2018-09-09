@@ -1,36 +1,111 @@
 <link rel="import" href="../polymer/polymer-element.html">
+<link rel="import" href="../iron-flex-layout/iron-flex-layout-classes.html">
+<script src="playcanvas-latest.js"></script>
 
 <dom-module id="plutonium-playcanvas">
-  <template>
-    <style>
-      :host {
-        display: block;
-      }
-    </style>
-    <h2>Hello [[prop1]]!</h2>
-  </template>
+    <template>
+        <style include="iron-flex">
+            :host {
+                display: block;
+                @apply --layout-horizontal;
+                @apply --layout-center;
+            }
+        </style>
+        <canvas id="applicationCanvas"></canvas>
 
-  <script>
-    /**
-     * `plutonium-playcanvas`
-     * Plutonium 2.0 based wrapper element for PlayCanvas Engine.
-     *
-     * @customElement
-     * @polymer
-     * @demo demo/index.html
-     */
-    class PlutoniumPlaycanvas extends Polymer.Element {
-      static get is() { return 'plutonium-playcanvas'; }
-      static get properties() {
-        return {
-          prop1: {
-            type: String,
-            value: 'plutonium-playcanvas'
-          }
-        };
-      }
-    }
+        <slot id="content" name="game">
 
-    window.customElements.define(PlutoniumPlaycanvas.is, PlutoniumPlaycanvas);
-  </script>
+        </slot>
+    </template>
+
+    <script>
+        /**
+         * `plutonium-playcanvas`
+         * Plutonium 2.0 based wrapper element for PlayCanvas Engine.
+         *
+         * @customElement
+         * @polymer
+         * @demo demo/index.html
+         */
+        class PlutoniumPlaycanvas extends Polymer.Element {
+            static get is() {
+                return 'plutonium-playcanvas';
+            }
+
+            static get properties() {
+                return {
+                    application: {
+                        type: Object,
+                        notify: true
+                    }
+                };
+            }
+
+
+            ready() {
+                super.ready();
+                this.application = new pc.Application(this.$.applicationCanvas, {});
+                console.log(PlutoniumPlaycanvas.is, 'ready');
+
+
+                let self = this;
+                // ensure canvas is resized when window changes size
+                this.addEventListener('resize', function () {
+                    self.application.resizeCanvas();
+                });
+
+
+            }
+
+            connectedCallback() {
+                super.connectedCallback();
+
+                this._observer = new Polymer.FlattenedNodesObserver(this.$.content, (info) => {
+                    this._processNewNodes(info.addedNodes.filter(function (node) {
+                        return (node.nodeType === Node.ELEMENT_NODE)
+                    }));
+                    this._processRemovedNodes(info.removedNodes.filter(function (node) {
+                        return (node.nodeType === Node.ELEMENT_NODE)
+                    }));
+                });
+
+
+            }
+
+            disconnectedCallback() {
+                super.disconnectedCallback();
+
+                this._observer.disconnect();
+
+                this.application = null;
+            }
+
+            _processNewNodes(nodes) {
+                let self = this;
+                nodes.forEach((node, index, array) => {
+                    console.debug(node.id, 'start application');
+                    node.application = self.application;
+                    // register a global update event
+                    node.application.on('update', function (deltaTime) {
+                        node.dispatchEvent(new CustomEvent('playcanvas-update', {
+                            detail: {
+                                delta: deltaTime
+                            }
+                        }));
+                    });
+                });
+
+
+            }
+
+            _processRemovedNodes(nodes) {
+                nodes.forEach((node, index, array) => {
+                    console.log(node.id, 'destroy application');
+                    node.application = null;
+                });
+            }
+        }
+
+        window.customElements.define(PlutoniumPlaycanvas.is, PlutoniumPlaycanvas);
+    </script>
 </dom-module>

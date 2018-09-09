@@ -1,0 +1,78 @@
+<link rel="import" href="../polymer/polymer-element.html">
+
+<script>
+    // Create my namespace, if it doesn't exist
+    if (!window.Plutonium) {
+        window.Plutonium = {};
+    }
+
+    /**
+     * Element class mixin that provides meta-programming for Polymer's template
+     * binding and data observation (collectively, "property effects") system.
+     *
+     * This mixin uses provides the following key static methods for adding
+     * property effects to an element class:
+     * - `addPropertyEffect`
+     * - `bindTemplate`
+     *
+     * Each method creates one or more property accessors, along with metadata
+     *
+     * @mixinFunction
+     * @polymer
+     * @appliesMixin Polymer.TemplateStamp
+     * @appliesMixin Polymer.PropertyAccessors
+     * @memberof Polymer
+     * @summary Element class mixin that provides meta-programming for Polymer's
+     * template binding and data observation system.
+     */
+    Plutonium.PlaycanvasApplicationMixin = Polymer.dedupingMixin((base) => class extends base {
+
+        constructor() {
+            super();
+        }
+
+        // static get properties() {
+        //     return {};
+        // }
+        //
+        // static get observers() {
+        //     return [];
+        // }
+
+        ready() {
+            super.ready();
+            console.debug(this.id, 'is ready');
+            this.addEventListener('playcanvas-initialize', this.onInitializeApplication);
+            this.addEventListener('playcanvas-update', this.onUpdateApplication);
+        }
+
+        connectedCallback() {
+            super.connectedCallback();
+
+            this.application.start();
+            this.dispatchEvent(new CustomEvent('playcanvas-initialize', {}));
+
+            console.debug(this.id, 'attached');
+        }
+
+        disconnectedCallback() {
+            super.connectedCallback();
+
+            this.dispatchEvent(new CustomEvent('playcanvas-initialize', {}));
+            console.debug(this.id, 'detached');
+
+            this.application.destroy();
+        }
+
+        onInitializeApplication(event) {
+            console.warn(this.id, 'should override initialization');
+        }
+
+        onUpdateApplication(event) {
+            console.warn(this.id, 'should override update');
+            let deltaTime = event.detail.delta;
+            cube.rotate(10 * deltaTime, 20 * deltaTime, 30 * deltaTime);
+        }
+    });
+
+</script>
